@@ -75,3 +75,11 @@ undefined
 [2024-11-02 09:28:34.671 PM] info: Request received 	POST /order 401 2ms
 [2024-11-02 09:29:00.388 PM] error: {"error":"Invalid data","details":[{"message":"depth is Expected number, received string"}],"statusCode":400}
 [2024-11-02 09:29:00.390 PM] info: Request received 	POST /order 400 10ms
+[2024-11-02 10:09:45.661 PM] error: {"code":"ERR_INVALID_ARG_TYPE"}
+[2024-11-02 10:09:45.664 PM] info: Request received 	POST /order 500 3ms
+[2024-11-02 10:09:46.491 PM] error: {"code":"ERR_INVALID_ARG_TYPE"}
+[2024-11-02 10:09:46.492 PM] info: Request received 	POST /order 500 2ms
+[2024-11-02 10:10:14.609 PM] error: {"code":"ERR_INVALID_ARG_TYPE"}
+[2024-11-02 10:10:14.612 PM] info: Request received 	POST /order 500 4ms
+[2024-11-02 10:10:24.136 PM] error: {"error":"Invalid data","details":[{"message":"depth is Expected number, received string"}],"statusCode":400}
+[2024-11-02 10:10:24.139 PM] info: Request received 	POST /order 400 11ms
