@@ -2,7 +2,7 @@
 .env
 
 #logs
-./log.log
+log.log
 
 #IDE
 /.idea
