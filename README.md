@@ -1,2 +1,2 @@
-# ts-express-prizma
-ts + express + prizma
+# ts-express-prisma
+ts + express + prisma
