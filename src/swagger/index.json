@@ -130,5 +130,10 @@
         "scheme": "basic"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
 }
