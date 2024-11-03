@@ -2,7 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import winston from 'winston';
 import expressWinston from 'express-winston';
+import swaggerUi from 'swagger-ui-express';
 
+import swaggerDocument from './swagger/index.json';
 import logFactory from './utilities/logs';
 import { authMiddleware } from './middlewares/auth';
 import errorHandlingMiddleware from './middlewares/errorHandling';
@@ -10,7 +12,8 @@ import router from './routes';
 
 const app = express();
 
-app.use(
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+    .use(
     expressWinston.logger({
         transports: [
             new winston.transports.Console(),
