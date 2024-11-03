@@ -13,6 +13,12 @@ import router from './routes';
 const app = express();
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+    .use((req, res, next) => {
+        req['traceId'] = crypto.randomUUID();
+        next();
+    })
+    .use(authMiddleware())
+    .use(bodyParser.json())
     .use(
         expressWinston.logger({
             transports: [
@@ -21,6 +27,11 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
                     filename: 'log.log',
                 }),
             ],
+            dynamicMeta: (req) => {
+                return {
+                    traceId: req.traceId,
+                };
+            },
             format: winston.format.combine(
                 winston.format.json(),
                 winston.format.timestamp({
@@ -29,7 +40,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
                 winston.format.align(),
                 winston.format.printf(
                     (info) =>
-                        `[${info.timestamp}] ${info.level}: Request received ${info.message}`,
+                        `[${info.timestamp}][${info.meta.traceId}][${info.level}]: Request received ${info.message}`,
                 ),
             ),
             meta: true,
@@ -37,8 +48,6 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
             colorize: false,
         }),
     )
-    .use(authMiddleware())
-    .use(bodyParser.json())
     .use('/', router)
     .use(
         expressWinston.errorLogger({
@@ -48,6 +57,11 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
                     filename: 'log.log',
                 }),
             ],
+            dynamicMeta: (req) => {
+                return {
+                    traceId: req.traceId,
+                };
+            },
             format: winston.format.combine(
                 winston.format.timestamp({
                     format: 'YYYY-MM-DD hh:mm:ss.SSS A',
@@ -55,7 +69,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
                 winston.format.align(),
                 winston.format.printf(
                     (info) =>
-                        `[${info.timestamp}] ${info.level}: ${JSON.stringify(info.meta.error)}`,
+                        `[${info.timestamp}][${info.meta.traceId}][${info.level}]: ${JSON.stringify(info.meta.error)}`,
                 ),
             ),
         }),
