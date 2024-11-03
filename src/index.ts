@@ -12,7 +12,7 @@ import router from './routes';
 
 const app = express();
 
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
     .use(
     expressWinston.logger({
         transports: [
