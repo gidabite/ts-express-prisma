@@ -1,0 +1,75 @@
+openapi: 3.1.0
+info:
+  title: Навзвание
+  version: 1.0.0
+  description: Описание
+servers:
+  - url: http://v2652438.hosted-by-vdsina.ru:3000
+tags:
+  - name: order
+    description: Everything about Orders
+  - name: pet
+    description: Everything about your Pets
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+  - name: store
+    description: Access to Petstore orders
+    externalDocs:
+      description: Find out more about our store
+      url: http://swagger.io
+  - name: user
+    description: Operations about user
+paths:
+  /order:
+    post:
+      tags:
+        - order
+      summary: Create an Order
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrder'
+      responses:
+        '200':
+          description: Successful operationId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+components:
+  schemas:
+    Order:
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            examples: [eaed9eea-0126-4d8f-95cf-0f7b3f44074f]
+      - $ref: '#/components/schemas/CreateOrder'
+    CreateOrder:
+      type: object
+      properties:
+        name:
+          type: string
+          examples: [ddd]
+        type:
+          type: string
+          examples: [yyy]
+        depth:
+          type: integer
+          format: int64
+          examples: [21]
+    Orders:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
