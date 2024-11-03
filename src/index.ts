@@ -14,29 +14,29 @@ const app = express();
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
     .use(
-    expressWinston.logger({
-        transports: [
-            new winston.transports.Console(),
-            new winston.transports.File({
-                filename: 'log.log',
-            }),
-        ],
-        format: winston.format.combine(
-            winston.format.json(),
-            winston.format.timestamp({
-                format: 'YYYY-MM-DD hh:mm:ss.SSS A',
-            }),
-            winston.format.align(),
-            winston.format.printf(
-                (info) =>
-                    `[${info.timestamp}] ${info.level}: Request received ${info.message}`,
+        expressWinston.logger({
+            transports: [
+                new winston.transports.Console(),
+                new winston.transports.File({
+                    filename: 'log.log',
+                }),
+            ],
+            format: winston.format.combine(
+                winston.format.json(),
+                winston.format.timestamp({
+                    format: 'YYYY-MM-DD hh:mm:ss.SSS A',
+                }),
+                winston.format.align(),
+                winston.format.printf(
+                    (info) =>
+                        `[${info.timestamp}] ${info.level}: Request received ${info.message}`,
+                ),
             ),
-        ),
-        meta: true,
-        expressFormat: true,
-        colorize: false,
-    }),
-)
+            meta: true,
+            expressFormat: true,
+            colorize: false,
+        }),
+    )
     .use(authMiddleware())
     .use(bodyParser.json())
     .use('/', router)
