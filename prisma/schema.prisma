@@ -15,5 +15,5 @@ model object {
   type  String
   name  String
   depth Int
+  test  String?
 }
-
