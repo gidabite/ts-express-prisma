@@ -17,8 +17,6 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
         req['traceId'] = crypto.randomUUID();
         next();
     })
-    .use(authMiddleware())
-    .use(bodyParser.json())
     .use(
         expressWinston.logger({
             transports: [
@@ -48,6 +46,8 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
             colorize: false,
         }),
     )
+    .use(authMiddleware())
+    .use(bodyParser.json())
     .use('/', router)
     .use(
         expressWinston.errorLogger({
