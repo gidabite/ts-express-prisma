@@ -23,7 +23,6 @@ router
                 res.status(201).send(
                     await prisma.object.create({
                         data: {
-                            id: crypto.randomUUID(),
                             name: req.body.name,
                             type: req.body.type,
                             depth: req.body.depth,

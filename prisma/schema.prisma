@@ -11,7 +11,7 @@ datasource db {
 }
 
 model object {
-  id    String  @id
+  id    String  @id @default(uuid())
   type  String
   name  String
   depth Int
