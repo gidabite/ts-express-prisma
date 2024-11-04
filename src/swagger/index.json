@@ -105,14 +105,9 @@
                 }
             },
             "Orders": {
-                "type": "object",
-                "properties": {
-                    "orders": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Order"
-                        }
-                    }
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Order"
                 }
             }
         },

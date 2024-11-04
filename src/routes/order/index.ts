@@ -11,9 +11,7 @@ router
     .route('/order')
     .get(async (_: Request, res: Response, next: NextFunction) => {
         try {
-            res.send({
-                orders: await prisma.object.findMany(),
-            });
+            res.send(await prisma.object.findMany());
         } catch (e) {
             next(e);
         }
@@ -22,16 +20,16 @@ router
         validateData(orderCreateSchema),
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const order = await prisma.object.create({
-                    data: {
-                        id: crypto.randomUUID(),
-                        name: req.body.name,
-                        type: req.body.type,
-                        depth: req.body.depth,
-                    },
-                });
-
-                res.status(201).send(order);
+                res.status(201).send(
+                    await prisma.object.create({
+                        data: {
+                            id: crypto.randomUUID(),
+                            name: req.body.name,
+                            type: req.body.type,
+                            depth: req.body.depth,
+                        },
+                    }),
+                );
             } catch (e) {
                 next(e);
             }
