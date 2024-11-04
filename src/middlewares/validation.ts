@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 
-export function validateData(
+const validateData = (
     schemaParams: z.ZodObject<any, any> | null,
     schemaBody: z.ZodObject<any, any> | null = null,
-) {
+) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             if (schemaParams) schemaParams.parse(req.params);
@@ -25,4 +25,6 @@ export function validateData(
             }
         }
     };
-}
+};
+
+export default validateData;

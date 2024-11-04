@@ -7,9 +7,10 @@ import swaggerUi from 'swagger-ui-express';
 
 import swaggerDocument from './swagger/index.json';
 import logFactory from './utilities/logs';
-import { authMiddleware } from './middlewares/auth';
+import authMiddleware from './middlewares/auth';
 import errorHandlingMiddleware from './middlewares/errorHandling';
 import router from './routes';
+import notFound from './middlewares/notFound';
 
 const app = express();
 
@@ -75,6 +76,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
             ),
         }),
     )
+    .use(notFound)
     .use(errorHandlingMiddleware);
 
 app.listen(3000, async () => {

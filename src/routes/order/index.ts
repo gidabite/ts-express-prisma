@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
-import { validateData } from '../../middlewares/validation';
+import validateData from '../../middlewares/validation';
 import { postBodySchema } from './schemas';
 
 const router = express.Router();

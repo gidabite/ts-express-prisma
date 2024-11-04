@@ -1,6 +1,6 @@
 import basicAuth from 'express-basic-auth';
 
-export const authMiddleware = () =>
+const authMiddleware = () =>
     basicAuth({
         users: {
             [process.env.BASIC_AUTH_LOGIN]: process.env.BASIC_AUTH_PASSWORD,
@@ -12,3 +12,5 @@ export const authMiddleware = () =>
             };
         },
     });
+
+export default authMiddleware;
