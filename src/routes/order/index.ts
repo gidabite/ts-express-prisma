@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 import { validateData } from '../../middlewares/validation';
-import { orderCreateSchema } from './schema';
+import { postBodySchema } from './schemas';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -17,7 +17,7 @@ router
         }
     })
     .post(
-        validateData(orderCreateSchema),
+        validateData(null, postBodySchema),
         async (req: Request, res: Response, next: NextFunction) => {
             try {
                 res.status(201).send(
