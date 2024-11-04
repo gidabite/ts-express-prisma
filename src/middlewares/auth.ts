@@ -3,8 +3,7 @@ import basicAuth from 'express-basic-auth';
 export const authMiddleware = () =>
     basicAuth({
         users: {
-            [process.env.BASIC_AUTH_LOGIN as string]: process.env
-                .BASIC_AUTH_PASSWORD as string,
+            [process.env.BASIC_AUTH_LOGIN]: process.env.BASIC_AUTH_PASSWORD,
         },
         unauthorizedResponse: () => {
             throw {
