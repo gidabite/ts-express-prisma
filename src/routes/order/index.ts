@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 import { validateData } from '../../middlewares/validation';
-import { orderCreateSchema } from './scheme';
+import { orderCreateSchema } from './schema';
 
 const router = express.Router();
 const prisma = new PrismaClient();
