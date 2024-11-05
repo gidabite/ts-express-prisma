@@ -67,27 +67,30 @@ router.post(
                     id: req.params.id,
                 },
                 include: {
-                    payments: true,
+                    payments: {
+                        where: {
+                            status: PaymentStatus.PENDING,
+                        },
+                    },
                 },
             });
-
             if (!order) {
                 res.status(404).send({
                     statusCode: 404,
                     message: `Order ${req.params.id} isn't found`,
                 });
             } else {
-                let paymentSuccess;
+                let pendingPayment;
 
                 switch (order.status) {
                     case ObjectStatus.NEW:
-                        paymentSuccess = await prisma.object.update({
+                        pendingPayment = await prisma.object.update({
                             data: {
                                 cartId: crypto.randomUUID(),
                                 status: ObjectStatus.PENDING_PAYMENT,
                                 payments: {
                                     create: {
-                                        status: PaymentStatus.SUCCESS,
+                                        status: PaymentStatus.PENDING,
                                     },
                                 },
                             },
@@ -103,36 +106,40 @@ router.post(
                         });
                         break;
                     case ObjectStatus.PENDING_PAYMENT:
-                        paymentSuccess = await prisma.object.update({
-                            data: {
-                                payments: {
-                                    create: {
-                                        status: PaymentStatus.SUCCESS,
+                        if (order?.payments.length > 0) {
+                            pendingPayment = order;
+                        } else {
+                            pendingPayment = await prisma.object.update({
+                                data: {
+                                    payments: {
+                                        create: {
+                                            status: PaymentStatus.PENDING,
+                                        },
                                     },
                                 },
-                            },
-                            where: {
-                                id: order.id,
-                                updateTimestamp: order.updateTimestamp,
-                                status: ObjectStatus.PENDING_PAYMENT,
-                            },
-                            include: {
-                                payments: true,
-                            },
-                        });
+                                where: {
+                                    id: order.id,
+                                    updateTimestamp: order.updateTimestamp,
+                                    status: ObjectStatus.PENDING_PAYMENT,
+                                },
+                                include: {
+                                    payments: true,
+                                },
+                            });
+                        }
                         break;
                     default:
                         break;
                 }
 
-                if (!paymentSuccess) {
-                    res.status(200).send({
+                if (!pendingPayment) {
+                    res.send({
                         statusCode: 200,
                         message: `It isn't possible to initiate a payment for Order ${req.params.id}`,
                     });
                 }
 
-                res.send(paymentSuccess);
+                res.send(pendingPayment);
             }
         } catch (e) {
             next(e);

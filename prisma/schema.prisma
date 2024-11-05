@@ -11,7 +11,7 @@ datasource db {
 }
 
 model object {
-  id              String       @id @default(uuid())
+  id              String       @id @default(uuid()) @db.Uuid()
   name            String
   createTimestamp DateTime     @default(now())
   status          ObjectStatus @default(NEW)
@@ -21,10 +21,11 @@ model object {
 }
 
 model payment {
-  id              String        @id @default(uuid())
-  status          PaymentStatus
+  id              String        @id @default(uuid()) @db.Uuid()
+  status          PaymentStatus @default(PENDING)
   cartId          String        @db.Uuid()
   createTimestamp DateTime      @default(now())
+  updateTimestamp DateTime      @default(now()) @updatedAt
   object          object        @relation(fields: [cartId], references: [cartId])
 }
 
@@ -37,6 +38,8 @@ enum ObjectStatus {
 }
 
 enum PaymentStatus {
+  PENDING
   REJECTED
   SUCCESS
+  CANCELED
 }
