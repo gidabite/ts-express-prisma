@@ -71,7 +71,6 @@ router.post(
                 },
             });
 
-            console.log(order);
             if (!order) {
                 res.status(404).send({
                     statusCode: 404,
