@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import validateData from '../../middlewares/validation';
-import { postBodySchema } from './schemas';
+import { getParamSchema, postBodySchema, postPayParamSchema } from './schemas';
 import prisma from '../../prisma/client';
 import { ObjectStatus, PaymentStatus } from '@prisma/client';
 
@@ -9,13 +9,16 @@ const router = express.Router();
 
 router
     .route('/order')
-    .get(async (_: Request, res: Response, next: NextFunction) => {
-        try {
-            res.send(await prisma.object.findMany());
-        } catch (e) {
-            next(e);
-        }
-    })
+    .get(
+        validateData(),
+        async (_: Request, res: Response, next: NextFunction) => {
+            try {
+                res.send(await prisma.object.findMany());
+            } catch (e) {
+                next(e);
+            }
+        },
+    )
     .post(
         validateData(null, postBodySchema),
         async (req: Request, res: Response, next: NextFunction) => {
@@ -35,6 +38,7 @@ router
 
 router.get(
     '/order/:id',
+    validateData(getParamSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const order = await prisma.object.findUnique({
@@ -60,6 +64,7 @@ router.get(
 
 router.post(
     '/order/:id/pay',
+    validateData(postPayParamSchema),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const order = await prisma.object.findUnique({
