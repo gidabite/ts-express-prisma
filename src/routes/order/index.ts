@@ -123,7 +123,11 @@ router.post(
                                     status: ObjectStatus.PENDING_PAYMENT,
                                 },
                                 include: {
-                                    payments: true,
+                                    payments: {
+                                        where: {
+                                            status: PaymentStatus.PENDING,
+                                        },
+                                    },
                                 },
                             });
                         }
