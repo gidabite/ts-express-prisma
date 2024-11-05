@@ -11,8 +11,32 @@ datasource db {
 }
 
 model object {
-  id    String @id @default(uuid())
-  type  String
-  name  String
-  depth Int
+  id              String       @id @default(uuid())
+  name            String
+  createTimestamp DateTime     @default(now())
+  status          ObjectStatus @default(NEW)
+  payments        payment[]
+  cartId          String?      @unique @db.Uuid()
+  updateTimestamp DateTime     @default(now()) @updatedAt
+}
+
+model payment {
+  id              String        @id @default(uuid())
+  status          PaymentStatus
+  cartId          String        @db.Uuid()
+  createTimestamp DateTime      @default(now())
+  object          object        @relation(fields: [cartId], references: [cartId])
+}
+
+enum ObjectStatus {
+  NEW
+  PENDING_PAYMENT
+  PAID
+  COMPLETED
+  REJECTED
+}
+
+enum PaymentStatus {
+  REJECTED
+  SUCCESS
 }
