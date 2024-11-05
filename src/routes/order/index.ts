@@ -87,7 +87,7 @@ router.post(
                                 status: ObjectStatus.PENDING_PAYMENT,
                                 payments: {
                                     create: {
-                                        status: PaymentStatus.SUCCESS,
+                                        status: PaymentStatus.PENDING,
                                     },
                                 },
                             },
@@ -107,7 +107,7 @@ router.post(
                             data: {
                                 payments: {
                                     create: {
-                                        status: PaymentStatus.SUCCESS,
+                                        status: PaymentStatus.PENDING,
                                     },
                                 },
                             },
