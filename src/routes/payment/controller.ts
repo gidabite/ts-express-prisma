@@ -40,7 +40,11 @@ export const updatePaymentStatus = async (
                             object: {
                                 update: {
                                     data: {
-                                        status: ObjectStatus.PAID,
+                                        status:
+                                            payment.object.status ===
+                                            ObjectStatus.PENDING_PAYMENT
+                                                ? ObjectStatus.PAID
+                                                : ObjectStatus.ERROR,
                                     },
                                 },
                             },
@@ -49,7 +53,7 @@ export const updatePaymentStatus = async (
                             id: payment.id,
                             updateTimestamp: payment.updateTimestamp,
                             object: {
-                                status: ObjectStatus.PENDING_PAYMENT,
+                                status: payment.object.status,
                                 updateTimestamp: payment.object.updateTimestamp,
                             },
                         },

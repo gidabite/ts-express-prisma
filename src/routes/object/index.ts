@@ -153,6 +153,7 @@ router.post(
                         break;
 
                     case ObjectStatus.PAID:
+                    case ObjectStatus.ERROR:
                         pendingPayment = await prisma.object.update({
                             data: {
                                 status: ObjectStatus.CANCELED,
