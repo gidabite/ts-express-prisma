@@ -1,7 +1,8 @@
 import express from 'express';
 
-import order from './order';
+import object from './object';
+import payment from './payment';
 
-const router = express.Router().use(order);
+const router = express.Router().use(object).use(payment);
 
 export default router;

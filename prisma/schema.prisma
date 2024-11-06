@@ -12,34 +12,33 @@ datasource db {
 
 model object {
   id              String       @id @default(uuid()) @db.Uuid()
-  name            String
   createTimestamp DateTime     @default(now())
+  updateTimestamp DateTime     @default(now()) @updatedAt
   status          ObjectStatus @default(NEW)
   payments        payment[]
-  cartId          String?      @unique @db.Uuid()
-  updateTimestamp DateTime     @default(now()) @updatedAt
+  trainNumber     String       @db.VarChar(4)
 }
 
 model payment {
   id              String        @id @default(uuid()) @db.Uuid()
-  status          PaymentStatus @default(PENDING)
-  cartId          String        @db.Uuid()
+  status          PaymentStatus @default(NEW)
   createTimestamp DateTime      @default(now())
   updateTimestamp DateTime      @default(now()) @updatedAt
-  object          object        @relation(fields: [cartId], references: [cartId])
+  objectId        String        @db.Uuid()
+  object          object        @relation(fields: [objectId], references: [id])
 }
 
 enum ObjectStatus {
   NEW
   PENDING_PAYMENT
   PAID
-  COMPLETED
-  REJECTED
+  CANCELED
+  ERROR
 }
 
 enum PaymentStatus {
-  PENDING
+  NEW
   REJECTED
   SUCCESS
-  CANCELED
+  REFUND
 }
