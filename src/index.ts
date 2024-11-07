@@ -15,7 +15,7 @@ import notFound from './middlewares/notFound';
 const app = express();
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-    .use((req, res, next) => {
+    .use((req, _, next) => {
         req['traceId'] = crypto.randomUUID();
         next();
     })
