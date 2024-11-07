@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import validateData from '../../middlewares/validation';
-import { objectIdSchema, patchBodySchema } from './schemas';
 import prisma from '../../prisma/client';
 import { updatePaymentStatus } from './controller';
+import { objectIdSchema, patchBodySchema } from './schemas';
 
 const router = express.Router();
 

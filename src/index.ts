@@ -1,16 +1,17 @@
 import 'dotenv/config';
-import express from 'express';
+
 import bodyParser from 'body-parser';
-import winston from 'winston';
+import express from 'express';
 import expressWinston from 'express-winston';
 import swaggerUi from 'swagger-ui-express';
+import winston from 'winston';
 
-import swaggerDocument from './swagger/index.json';
-import logFactory from './utilities/logs';
 import authMiddleware from './middlewares/auth';
 import errorHandlingMiddleware from './middlewares/errorHandling';
-import router from './routes';
 import notFound from './middlewares/notFound';
+import router from './routes';
+import swaggerDocument from './swagger/index.json';
+import logFactory from './utilities/logs';
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(
     swaggerUi.setup(swaggerDocument, undefined, { docExpansion: 'none' }),
 )
     .use((req, _, next) => {
-        req['traceId'] = crypto.randomUUID();
+        req.traceId = crypto.randomUUID();
         next();
     })
     .use(

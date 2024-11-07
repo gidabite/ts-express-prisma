@@ -1,9 +1,9 @@
+import { ObjectStatus, PaymentStatus } from '@prisma/client';
 import express, { NextFunction, Request, Response } from 'express';
 
 import validateData from '../../middlewares/validation';
-import { objectIdSchema, postBodySchema } from './schemas';
 import prisma from '../../prisma/client';
-import { ObjectStatus, PaymentStatus } from '@prisma/client';
+import { objectIdSchema, postBodySchema } from './schemas';
 
 const router = express.Router();
 

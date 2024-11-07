@@ -1,10 +1,8 @@
-import dotenv from 'dotenv';
 import path from 'path';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { fileURLToPath } from 'url';
 import nodeExternals from 'webpack-node-externals';
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
-dotenv.config();
 export default {
     entry: './src/index.ts',
     output: {
@@ -38,6 +36,5 @@ export default {
     node: {
         __dirname: false,
     },
-    // eslint-disable-next-line no-undef
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 };
