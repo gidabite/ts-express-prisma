@@ -86,3 +86,5 @@ app.use(
 app.listen(3000, async () => {
     logFactory().info('Express server initialized');
 });
+
+export default app;
