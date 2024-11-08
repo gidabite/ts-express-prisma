@@ -163,7 +163,6 @@
                                                 "examples": ["CANCELED"]
                                             },
                                             "payments": {
-                                                "type": "array",
                                                 "items": {
                                                     "properties": {
                                                         "status":{
