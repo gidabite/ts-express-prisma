@@ -157,7 +157,6 @@
                             "application/json": {
                                 "schema": {
                                     "allOf": [{
-                                        "type": "object",
                                         "properties": {
                                             "status": {
                                                 "examples": ["CANCELED"]
@@ -326,7 +325,7 @@
             },
             "ObjectId": {
                 "type": "string",
-                "examples": ["{object-id-uuid}"]
+                "examples": ["f3279f9d-23e2-4f35-b42a-87f5385cc201"]
             },
             "Object": {
                 "allOf": [{
@@ -398,7 +397,7 @@
                     "properties": {
                         "id": {
                             "type": "string",
-                            "examples": ["{payment-id-uuid}"]
+                            "examples": ["a7358ff4-3487-4c48-b7cc-9c78601b96fc"]
                         },
                         "status": {
                             "$ref": "#/components/schemas/PaymentStatus"
