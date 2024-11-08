@@ -55,7 +55,7 @@ router.patch(
             console.log(updatedPayment);
             if (!updatedPayment) {
                 next({
-                    statusCode: 200,
+                    statusCode: 422,
                     message: `It isn't possible to update a status for Payment ${req.params.id}`,
                 });
             } else {
