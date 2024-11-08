@@ -107,7 +107,7 @@ router.post(
 
                 if (!pendingPayment) {
                     next({
-                        statusCode: 200,
+                        statusCode: 422,
                         message: `It isn't possible to initiate a payment for Object ${req.params.id}`,
                     });
                 } else {
@@ -183,8 +183,8 @@ router.post(
 
                 if (!pendingPayment) {
                     next({
-                        statusCode: 200,
-                        message: `It isn't possible to initiate a payment for Object ${req.params.id}`,
+                        statusCode: 422,
+                        message: `It isn't possible to cancel an Object ${req.params.id}`,
                     });
                 } else {
                     res.send(pendingPayment);

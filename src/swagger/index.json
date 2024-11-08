@@ -12,55 +12,295 @@
     ],
     "tags": [
         {
-            "name": "order",
-            "description": "Everything about Orders"
+            "name": "Object",
+            "description": "Everything about Objects"
         },
         {
-            "name": "pet",
-            "description": "Everything about your Pets",
-            "externalDocs": {
-                "description": "Find out more",
-                "url": "http://swagger.io"
-            }
-        },
-        {
-            "name": "store",
-            "description": "Access to Petstore orders",
-            "externalDocs": {
-                "description": "Find out more about our store",
-                "url": "http://swagger.io"
-            }
-        },
-        {
-            "name": "user",
-            "description": "Operations about user"
+            "name": "Payment",
+            "description": "Everything about Payments"
         }
     ],
     "paths": {
-        "/order": {
+        "/object": {
+            "get": {
+                "tags": ["Object"],
+                "summary": "Show all Objects",
+                "operationId": "showOrders",
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Objects"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            },
             "post": {
-                "tags": ["order"],
-                "summary": "Create an Order",
+                "tags": ["Object"],
+                "summary": "Create an Object",
                 "operationId": "createOrder",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CreateOrder"
+                                "$ref": "#/components/schemas/CreateObject"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful operationId",
+                        "description": "A successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Order"
+                                    "$ref": "#/components/schemas/Object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    }
+                }
+            }
+        },
+        "/object/{uuid}": {
+            "get": {
+                "tags": ["Object"],
+                "summary": "Show all Objects",
+                "operationId": "showOrder",
+                "parameters": [{
+                    "$ref": "#/components/parameters/uuid"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObjectWithPayments"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            }
+        },
+        "/object/{uuid}/createPayment": {
+            "post": {
+                "tags": ["Object"],
+                "summary": "Create a new Payment with status NEW for an Object",
+                "description": "A new Pyment will be created with the NEW status, and the Object will switch to the PANDING_PAYMENT status.",
+                "operationId": "createPaymentForOrder",
+                "parameters": [{
+                    "$ref": "#/components/parameters/uuid"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObjectWithPayments"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ImpossibleOperation"
+                    }
+                }
+            }
+        },
+        "/object/{uuid}/cancel": {
+            "post": {
+                "tags": ["Object"],
+                "summary": "Cancel an Object",
+                "description": "A Paymetn will be in the CANCELED status. All Payments in the SUCCESS status will switch to the REFUND status.",
+                "operationId": "cancelOrder",
+                "parameters": [{
+                    "$ref": "#/components/parameters/uuid"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [{
+                                        "type": "object",
+                                        "properties": {
+                                            "status": {
+                                                "examples": ["CANCELED"]
+                                            },
+                                            "payments": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "status":{
+                                                            "examples": ["REFUND"]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },{
+                                        "$ref": "#/components/schemas/ObjectWithPayments"
+                                    }]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ImpossibleOperation"
+                    }
+                }
+            }
+        },
+        "/payment": {
+            "get": {
+                "tags": ["Payment"],
+                "summary": "Show all Payments",
+                "operationId": "showPayments",
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Payments"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/payment/{uuid}": {
+            "get": {
+                "tags": ["Payment"],
+                "summary": "Show a Payment",
+                "operationId": "showPayment",
+                "parameters": [{
+                    "$ref": "#/components/parameters/uuid"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Payment"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            }
+        },
+        "/payment/{uuid}/status": {
+            "patch": {
+                "tags": ["Payment"],
+                "summary": "Update status for a Payment",
+                "operationId": "patchPaymentStatus",
+                "parameters": [{
+                    "$ref": "#/components/parameters/uuid"
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "allOf": [{
+                                            "examples": ["SUCCESS"]
+                                        }, {
+                                            "$ref": "#/components/schemas/PaymentStatus"
+                                        }]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [{
+                                        "properties": {
+                                            "status": {
+                                                "examples": ["SUCCESS"]
+                                            }
+                                        }
+                                    }, {
+                                        "$ref": "#/components/schemas/Payment"
+                                    }]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Validation"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 }
             }
@@ -68,47 +308,262 @@
     },
     "components": {
         "schemas": {
-            "Order": {
-                "allOf": [
-                    {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "examples": [
-                                    "eaed9eea-0126-4d8f-95cf-0f7b3f44074f"
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        "$ref": "#/components/schemas/CreateOrder"
-                    }
-                ]
-            },
-            "CreateOrder": {
+            "WithTimestamps": {
                 "type": "object",
                 "properties": {
-                    "name": {
+                    "createTimestamp": {
                         "type": "string",
-                        "examples": ["ddd"]
+                        "examples": [
+                            "2024-11-07T21:28:41.014Z"
+                        ]
+                    },
+                    "updateTimestamp": {
+                        "type": "string",
+                        "examples": [
+                            "2024-11-07T21:28:41.014Z"
+                        ]
+                    }
+                }
+            },
+            "ObjectId": {
+                "type": "string",
+                "examples": ["{object-id-uuid}"]
+            },
+            "Object": {
+                "allOf": [{
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/components/schemas/ObjectId"
+                        },
+                        "status": {
+                            "type": "string",
+                            "enum": [
+                                "NEW",
+                                "PENDING_PAYMENT",
+                                "PAID",
+                                "CANCELED",
+                                "ERROR"
+                            ],
+                            "examples": [
+                                "NEW"
+                            ]
+                        }
+                    }
+                }, {
+                    "$ref": "#/components/schemas/WithTimestamps"
+                }, {
+                    "$ref": "#/components/schemas/CreateObject"
+                }]
+            },
+            "ObjectWithPayments": {
+                "allOf": [{
+                    "$ref": "#/components/schemas/Object"
+                }, {
+                    "type": "object",
+                    "properties": {
+                        "payments": {
+                            "$ref": "#/components/schemas/Payments"
+                        }
+                    }
+                }]
+            },
+            "CreateObject": {
+                "type": "object",
+                "properties": {
+                    "trainNumber": {
+                        "type": "string",
+                        "examples": ["123Б"]
+                    }
+                }
+            },
+            "Objects": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Object"
+                }
+            },
+            "PaymentStatus": {
+                "type": "string",
+                "enum": [
+                    "NEW",
+                    "REJECTED",
+                    "SUCCESS",
+                    "REFUND"
+                ],
+                "examples": ["NEW"]
+            },
+            "Payment": {
+                "allOf": [{
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "examples": ["{payment-id-uuid}"]
+                        },
+                        "status": {
+                            "$ref": "#/components/schemas/PaymentStatus"
+                        },
+                        "objectId": {
+                            "$ref": "#/components/schemas/ObjectId"
+                        }
+                    }
+                }, {
+                    "$ref": "#/components/schemas/WithTimestamps"
+                }]
+            },
+            "Payments": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Payment"
+                }
+            },
+            "Unauthorized": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "examples": ["You aren't authorized"]
+                    },
+                    "statusCode": {
+                        "type": "integer",
+                        "examples": [401]
+                    }
+                }
+            },
+            "ParseBodyError": {
+                "type": "object",
+                "properties": {
+                    "expose": {
+                        "type": "boolean",
+                        "examples": [true]
+                    },
+                    "statusCode": {
+                        "type": "integer",
+                        "examples": [400]
+                    },
+                    "status": {
+                        "type": "integer",
+                        "examples": [400]
+                    },
+                    "body": {
+                        "type": "string",
+                        "examples": ["{\n  \"trainNumber\": \"123\n}"]
                     },
                     "type": {
                         "type": "string",
-                        "examples": ["yyy"]
-                    },
-                    "depth": {
-                        "type": "integer",
-                        "format": "int64",
-                        "examples": [21]
+                        "examples": ["entity.parse.failed"]
                     }
                 }
             },
-            "Orders": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/Order"
+            "ValidationDataError": {
+                "oneOf": [{
+                    "type": "object",
+                    "properties": {
+                        "error": {
+                            "type": "string",
+                            "examples": ["Invalid data"]
+                        },
+                        "details": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "examples": ["{property} is Invalid"]
+                                    }
+                                }
+                            }
+                        },
+                        "statusCode": {
+                            "type": "integer",
+                            "examples": [404]
+                        }
+                    }
+                }, {
+                    "$ref": "#/components/schemas/ParseBodyError"
+                }]
+            },
+            "NotFoundError": {
+                "type": "object",
+                "properties": {
+                    "statusCode": {
+                        "type": "integer",
+                        "examples": [404]
+                    },
+                    "message": {
+                        "type": "string",
+                        "examples": ["Object {object-id-uuid} isn't found"]
+                    }
                 }
+            },
+            "ImpossibleOperationError": {
+                "type": "object",
+                "properties": {
+                    "statusCode": {
+                        "type": "integer",
+                        "examples": [422]
+                    },
+                    "message": {
+                        "type": "string",
+                        "examples": ["It isn't possible to {opearetion}"]
+                    }
+                }
+            }
+        },
+        "responses": {
+            "Unauthorized": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Unauthorized"
+                        }
+                    }
+                }
+            },
+            "Validation": {
+                "description": "A input validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ValidationDataError"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "An object isn't found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/NotFoundError"
+                        }
+                    }
+                }
+            },
+            "ImpossibleOperation": {
+                "description": "It isn't possible to perform this operation",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ImpossibleOperationError"
+                        }
+                    }
+                }
+            }
+        },
+        "parameters":{
+            "uuid":{
+                "in": "path",
+                "name": "uuid",
+                "schema": {
+                    "type": "string"
+                },
+                "example": "66ab5528-c233-4109-9974-b09f083fc79d",
+                "required": true,
+                "description": "UUID of the entity to get"
             }
         },
         "securitySchemes": {
