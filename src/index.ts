@@ -9,7 +9,6 @@ import errorHandlingMiddleware from './middlewares/errorHandling';
 import notFound from './middlewares/notFound';
 import router from './routes';
 import swaggerDocument from './swagger/index.json';
-import logFactory from './utilities/logs';
 
 const app = express();
 
@@ -25,7 +24,6 @@ app.use(
     .use(
         expressWinston.logger({
             transports: [
-                new winston.transports.Console(),
                 new winston.transports.File({
                     filename: 'log.log',
                 }),
@@ -57,7 +55,6 @@ app.use(
     .use(
         expressWinston.errorLogger({
             transports: [
-                new winston.transports.Console(),
                 new winston.transports.File({
                     filename: 'log.log',
                 }),
@@ -82,8 +79,6 @@ app.use(
     .use(notFound)
     .use(errorHandlingMiddleware);
 
-const server = app.listen(3000, async () => {
-    logFactory().info('Express server initialized');
-});
+const server = app.listen(3000, async () => {});
 
 export default server;

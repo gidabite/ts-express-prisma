@@ -143,7 +143,7 @@ describe('Object Endpoints', () => {
     });
 
     describe('POST /object/:uuid/createPayment', () => {
-        let object: { id: string };
+        let object: { id: string; status: ObjectStatus };
 
         beforeEach(async () => {
             object = (
@@ -192,7 +192,9 @@ describe('Object Endpoints', () => {
             });
         });
 
-        it('should create a first payment for a new Object in a status NEW', async () => {
+        it('should create a new payment for an Object in a status = NEW', async () => {
+            expect(object.status).toEqual(ObjectStatus.NEW);
+
             const res = await requester
                 .object(authHeader)
                 .postCreatePayment(object.id);
@@ -228,7 +230,7 @@ describe('Object Endpoints', () => {
             );
         });
 
-        it('should create a second payment for a new Object in a status = PENDING_PAYMENT', async () => {
+        it('should create a new payment for an Object in a status = PENDING_PAYMENT', async () => {
             await requester.object(authHeader).postCreatePayment(object.id);
 
             const res = await requester
@@ -266,7 +268,7 @@ describe('Object Endpoints', () => {
             );
         });
 
-        it('should return the message about the inability to create a payment for a new Object in a status = PAID', async () => {
+        it('should return 422 error for an Object in a status = PAID', async () => {
             const paymentId = (
                 await requester.object(authHeader).postCreatePayment(object.id)
             ).body.payments[0].id;
@@ -275,11 +277,225 @@ describe('Object Endpoints', () => {
                 .payment(authHeader)
                 .postStatus(paymentId, PaymentStatus.SUCCESS);
 
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.PAID);
+
             const res = await requester
                 .object(authHeader)
                 .postCreatePayment(object.id);
 
-            const objectWithPaymentDB = await prisma.object.findUnique({
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(422);
+            expect(res.body).toEqual({
+                statusCode: 422,
+                message: `It isn't possible to initiate a payment for Object ${object.id}`,
+            });
+            expect(objectBefore).toEqual(objectAfter);
+        });
+
+        it('should return 422 error for an Object in a status = CANCELED', async () => {
+            await requester.object(authHeader).postCancel(object.id);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.CANCELED);
+
+            const res = await requester
+                .object(authHeader)
+                .postCreatePayment(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(422);
+            expect(res.body).toEqual({
+                statusCode: 422,
+                message: `It isn't possible to initiate a payment for Object ${object.id}`,
+            });
+            expect(objectBefore).toEqual(objectAfter);
+        });
+
+        it('should return 422 error for an Object in a status = ERROR', async () => {
+            const firstPaymentId = (
+                await requester.object(authHeader).postCreatePayment(object.id)
+            ).body.payments[0].id;
+
+            const secondPaymentId = (
+                await requester.object(authHeader).postCreatePayment(object.id)
+            ).body.payments[1].id;
+
+            await requester
+                .payment(authHeader)
+                .postStatus(firstPaymentId, PaymentStatus.SUCCESS);
+
+            await requester
+                .payment(authHeader)
+                .postStatus(secondPaymentId, PaymentStatus.SUCCESS);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.ERROR);
+
+            const res = await requester
+                .object(authHeader)
+                .postCreatePayment(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(422);
+            expect(res.body).toEqual({
+                statusCode: 422,
+                message: `It isn't possible to initiate a payment for Object ${object.id}`,
+            });
+            expect(objectBefore).toEqual(objectAfter);
+        });
+    });
+
+    describe('POST /object/:uuid/cancel', () => {
+        let object: { id: string; status: ObjectStatus };
+
+        beforeEach(async () => {
+            object = (
+                await requester.object(authHeader).post({
+                    trainNumber: '123Б',
+                })
+            ).body;
+        });
+
+        it('should return 401 error (Authentication error)', async () => {
+            const res = await requester
+                .object(invalidAuthHeader)
+                .postCancel(object.id);
+
+            expect(res.statusCode).toEqual(401);
+            expect(res.body).toEqual(invalidAuthAnswer);
+        });
+
+        it('should return 400 error for invalid an id', async () => {
+            const res = await requester
+                .object(authHeader)
+                .postCancel('invalidId');
+
+            expect(res.statusCode).toEqual(400);
+            expect(res.body).toEqual({
+                details: [
+                    {
+                        message: 'id is Invalid uuid',
+                    },
+                ],
+                error: 'Invalid data',
+                statusCode: 400,
+            });
+        });
+
+        it('should return 404 error', async () => {
+            const invalidId = crypto.randomUUID();
+            const res = await requester
+                .object(authHeader)
+                .postCancel(invalidId);
+
+            expect(res.statusCode).toEqual(404);
+            expect(res.body).toEqual({
+                statusCode: 404,
+                message: `Object ${invalidId} isn't found`,
+            });
+        });
+
+        it('should cancel an Object in a status = NEW', async () => {
+            expect(object.status).toEqual(ObjectStatus.NEW);
+
+            const res = await requester
+                .object(authHeader)
+                .postCancel(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(200);
+            expect(objectAfter).not.toBeNull();
+            if (!objectAfter) return;
+            expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
+            expect(res.body).toEqual(convertTimesInObjectDB(objectAfter));
+        });
+
+        it('should cancel an Object in a status = PENDING_PAYMENT', async () => {
+            await requester.object(authHeader).postCreatePayment(object.id);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.PENDING_PAYMENT);
+
+            const res = await requester
+                .object(authHeader)
+                .postCancel(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(200);
+            expect(objectAfter).not.toBeNull();
+            if (!objectAfter) return;
+            expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
+            expect(res.body).toEqual(convertTimesInObjectDB(objectAfter));
+        });
+
+        it('should cancel an Object in a status = PAID and refund a payment', async () => {
+            const paymentId = (
+                await requester.object(authHeader).postCreatePayment(object.id)
+            ).body.payments[0].id;
+
+            await requester
+                .payment(authHeader)
+                .postStatus(paymentId, PaymentStatus.SUCCESS);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.PAID);
+
+            const res = await requester
+                .object(authHeader)
+                .postCancel(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
                 where: {
                     id: object.id,
                 },
@@ -289,17 +505,108 @@ describe('Object Endpoints', () => {
             });
 
             expect(res.statusCode).toEqual(200);
-            expect(objectWithPaymentDB).not.toBeNull();
-            if (!objectWithPaymentDB) return;
-            expect(objectWithPaymentDB.status).toEqual(ObjectStatus.PAID);
-            expect(objectWithPaymentDB.payments).toHaveLength(1);
-            expect(objectWithPaymentDB.payments[0].status).toEqual(
-                PaymentStatus.SUCCESS,
+            expect(objectAfter).not.toBeNull();
+            if (!objectAfter) return;
+            expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
+            expect(objectAfter.payments[0].status).toEqual(
+                PaymentStatus.REFUND,
             );
-            expect(res.body).toEqual({
-                statusCode: 200,
-                message: `It isn't possible to initiate a payment for Object ${object.id}`,
+            expect(res.body).toEqual(
+                convertTimesInObjectDB({
+                    ...objectAfter,
+                    payments: [
+                        ...objectAfter.payments.map((paymentDB) =>
+                            convertTimesInObjectDB(paymentDB),
+                        ),
+                    ],
+                }),
+            );
+        });
+
+        it('should cancel an Object in a status = ERROR and refund a payment', async () => {
+            const firstPaymentId = (
+                await requester.object(authHeader).postCreatePayment(object.id)
+            ).body.payments[0].id;
+
+            const secondPaymentId = (
+                await requester.object(authHeader).postCreatePayment(object.id)
+            ).body.payments[1].id;
+
+            await requester
+                .payment(authHeader)
+                .postStatus(firstPaymentId, PaymentStatus.SUCCESS);
+
+            await requester
+                .payment(authHeader)
+                .postStatus(secondPaymentId, PaymentStatus.SUCCESS);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
             });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.ERROR);
+
+            const res = await requester
+                .object(authHeader)
+                .postCancel(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+                include: {
+                    payments: true,
+                },
+            });
+
+            expect(res.statusCode).toEqual(200);
+            expect(objectAfter).not.toBeNull();
+            if (!objectAfter) return;
+            expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
+            expect(objectAfter.payments[0].status).toEqual(
+                PaymentStatus.REFUND,
+            );
+            expect(res.body).toEqual(
+                convertTimesInObjectDB({
+                    ...objectAfter,
+                    payments: [
+                        ...objectAfter.payments.map((paymentDB) =>
+                            convertTimesInObjectDB(paymentDB),
+                        ),
+                    ],
+                }),
+            );
+        });
+
+        it('should return 422 error for an Object in a status = CANCELED', async () => {
+            await requester.object(authHeader).postCancel(object.id);
+
+            const objectBefore = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(objectBefore?.status).toEqual(ObjectStatus.CANCELED);
+
+            const res = await requester
+                .object(authHeader)
+                .postCancel(object.id);
+
+            const objectAfter = await prisma.object.findUnique({
+                where: {
+                    id: object.id,
+                },
+            });
+
+            expect(res.statusCode).toEqual(422);
+            expect(res.body).toEqual({
+                statusCode: 422,
+                message: `It isn't possible to cancel an Object ${object.id}`,
+            });
+            expect(objectBefore).toEqual(objectAfter);
         });
     });
 

@@ -52,7 +52,7 @@ router.patch(
                 req.params.id,
                 req.body.status,
             );
-            console.log(updatedPayment);
+
             if (!updatedPayment) {
                 next({
                     statusCode: 422,

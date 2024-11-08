@@ -19,7 +19,7 @@ const appOperations = () => {
                     .post(`/object/${id}/createPayment`)
                     .set(authHeader)
                     .send(),
-            postCreateCancel: (id: string) =>
+            postCancel: (id: string) =>
                 requester.post(`/object/${id}/cancel`).set(authHeader).send(),
         }),
         payment: (authHeader: IncomingHttpHeaders) => ({

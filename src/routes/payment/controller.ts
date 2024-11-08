@@ -84,6 +84,6 @@ export const updatePaymentStatus = async (
         default:
             break;
     }
-    console.log(updatedPayment);
+
     return updatedPayment;
 };
