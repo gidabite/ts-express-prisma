@@ -1,4 +1,5 @@
 import { ObjectStatus, PaymentStatus } from '@prisma/client';
+
 import prisma from '../../prisma/client';
 
 export const updatePaymentStatus = async (
@@ -83,6 +84,6 @@ export const updatePaymentStatus = async (
         default:
             break;
     }
-    console.log(updatedPayment);
+
     return updatedPayment;
 };
