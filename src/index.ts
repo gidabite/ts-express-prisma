@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import bodyParser from 'body-parser';
 import express from 'express';
 import expressWinston from 'express-winston';
@@ -84,8 +82,8 @@ app.use(
     .use(notFound)
     .use(errorHandlingMiddleware);
 
-app.listen(3000, async () => {
+const server = app.listen(3000, async () => {
     logFactory().info('Express server initialized');
 });
 
-export default app;
+export default server;
