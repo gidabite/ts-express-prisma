@@ -7,8 +7,8 @@ import appOperations from '../../src/utilities/operations';
 
 const convertTimesInObjectDB = <
     T extends {
-        createTimestamp?: Date;
-        updateTimestamp?: Date;
+        createTimestamp: Date;
+        updateTimestamp: Date;
     },
 >(
     objectDb: T | null,
@@ -16,8 +16,8 @@ const convertTimesInObjectDB = <
     objectDb
         ? {
               ...objectDb,
-              createTimestamp: objectDb.createTimestamp?.toISOString(),
-              updateTimestamp: objectDb.updateTimestamp?.toISOString(),
+              createTimestamp: objectDb.createTimestamp.toISOString(),
+              updateTimestamp: objectDb.updateTimestamp.toISOString(),
           }
         : null;
 
@@ -44,9 +44,7 @@ describe('Object Endpoints', () => {
             const objectsDb = await prisma.object.findMany();
 
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toEqual(
-                objectsDb.map((objectDb) => convertTimesInObjectDB(objectDb)),
-            );
+            expect(res.body).toEqual(objectsDb.map(convertTimesInObjectDB));
         });
     });
 
@@ -215,15 +213,15 @@ describe('Object Endpoints', () => {
                 ObjectStatus.PENDING_PAYMENT,
             );
             expect(objectWithPaymentDB.payments).toHaveLength(1);
-            expect(objectWithPaymentDB.payments[0].status).toEqual(
+            expect(objectWithPaymentDB.payments.at(0)?.status).toEqual(
                 PaymentStatus.NEW,
             );
             expect(res.body).toEqual(
                 convertTimesInObjectDB({
                     ...objectWithPaymentDB,
                     payments: [
-                        ...objectWithPaymentDB.payments.map((paymentDB) =>
-                            convertTimesInObjectDB(paymentDB),
+                        ...objectWithPaymentDB.payments.map(
+                            convertTimesInObjectDB,
                         ),
                     ],
                 }),
@@ -260,8 +258,8 @@ describe('Object Endpoints', () => {
                 convertTimesInObjectDB({
                     ...objectWithPaymentDB,
                     payments: [
-                        ...objectWithPaymentDB.payments.map((paymentDB) =>
-                            convertTimesInObjectDB(paymentDB),
+                        ...objectWithPaymentDB.payments.map(
+                            convertTimesInObjectDB,
                         ),
                     ],
                 }),
@@ -508,16 +506,14 @@ describe('Object Endpoints', () => {
             expect(objectAfter).not.toBeNull();
             if (!objectAfter) return;
             expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
-            expect(objectAfter.payments[0].status).toEqual(
+            expect(objectAfter.payments.at(0)?.status).toEqual(
                 PaymentStatus.REFUND,
             );
             expect(res.body).toEqual(
                 convertTimesInObjectDB({
                     ...objectAfter,
                     payments: [
-                        ...objectAfter.payments.map((paymentDB) =>
-                            convertTimesInObjectDB(paymentDB),
-                        ),
+                        ...objectAfter.payments.map(convertTimesInObjectDB),
                     ],
                 }),
             );
@@ -565,16 +561,14 @@ describe('Object Endpoints', () => {
             expect(objectAfter).not.toBeNull();
             if (!objectAfter) return;
             expect(objectAfter?.status).toEqual(ObjectStatus.CANCELED);
-            expect(objectAfter.payments[0].status).toEqual(
+            expect(objectAfter.payments.at(0)?.status).toEqual(
                 PaymentStatus.REFUND,
             );
             expect(res.body).toEqual(
                 convertTimesInObjectDB({
                     ...objectAfter,
                     payments: [
-                        ...objectAfter.payments.map((paymentDB) =>
-                            convertTimesInObjectDB(paymentDB),
-                        ),
+                        ...objectAfter.payments.map(convertTimesInObjectDB),
                     ],
                 }),
             );
