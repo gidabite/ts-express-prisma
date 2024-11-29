@@ -7,7 +7,8 @@
         "test": "jest",
         "start": "yarn build && node build/index.cjs",
         "build": "webpack",
-        "watch": "webpack --watch"
+        "watch": "webpack --watch",
+        "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'"
     },
     "author": "",
     "license": "ISC",
